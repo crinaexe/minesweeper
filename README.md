@@ -1,6 +1,6 @@
 # **Minesweeper Game**
 
-_This game was made after the concept of minesweeper_
+_This game was created in accordance with the concept of Minesweeper_
 
 **Minesweeper**  is a classic single-player puzzle game that challenges players to clear a hidden grid without detonating any mines. The grid consists of hidden squares, some of which contain mines, and the player's goal is to reveal all the squares that do not contain mines while avoiding those that do.
 
@@ -24,10 +24,11 @@ To start the game, simply run the main method.
     - The game is lost if you reveal a bomb.
    
 6. **Changing the board size and bomb number:**
-    - In the Board class, change the BOARD_SIZE and NR_OF_BOMBS values to change the size of the grid and the number of bombs.
-    - We recommend the following difficulties: 
-    -Easy: Board size is set to 5, number of bombs is set to 2
-    - Hard: Board size is set to 10, number of bomb is set to 10
+    - In the Board class, **change the values of** BOARD_SIZE and NR_OF_BOMBS to change the size of the grid and the number of bombs.
+    - **We recommend the following difficulties:**
+    - **Easy:** Board size is set to 5, number of bombs is set to 5
+    - **Medium:** Board size is set to 7, number of bombs is set to 10
+    - **Hard:** Board size is set to 10, number of bombs is set to 20
 
 ---
 ## **License**

@@ -1,12 +1,12 @@
 package helpers;
 
 import boards.HiddenBoard;
-import boards.PlayerBoard;
+import boards.DisplayBoard;
 
 public class GameManager {
     private boolean gameOver = false;
     private InputManager inputManager;
-    private PlayerBoard playerBoard;
+    private DisplayBoard displayBoard;
     private HiddenBoard hiddenBoard;
     private Coordinates coordinates;
 
@@ -20,45 +20,43 @@ public class GameManager {
             printBoard();
             String command = inputManager.checkCommand();
             coordinates = inputManager.getNumberSelection();
-            menu(command,coordinates);
-            if(playerWon()){
-                System.out.println("You won!");
-                gameOver = true;
-            }
+            performMenuAction(command,coordinates);
         }
     }
 
     private void initiateGame() throws Exception {
-        playerBoard =  new PlayerBoard();
+        displayBoard =  new DisplayBoard();
         printBoard();
-        inputManager = new InputManager(playerBoard.BOARD_SIZE);
-        System.out.println("Let's start the game! Enter your first coordinates (row, column). Enter after each coordinate");
+        inputManager = new InputManager(displayBoard.BOARD_SIZE);
         coordinates = inputManager.getNumberSelection();
 
         //Bomb is generated after player's first move, to prevent an instant lose
         hiddenBoard = new HiddenBoard(coordinates);
-        uncover(coordinates);
+        displayBoard.uncoverElement(coordinates,hiddenBoard);
     }
 
-    private void menu(String option, Coordinates coordinates){
+    private void performMenuAction(String option, Coordinates coordinates){
         switch (option) {
-            case "bo" -> playerBoard.markFlag(coordinates);
-            case "un" -> playerBoard.unMarkFlag(coordinates);
+            case "bo" -> markFlagAndCheckForWin();
+            case "un" -> displayBoard.unMarkFlag(coordinates);
             case "re" -> uncover(coordinates);
-            default -> System.out.println("command unknown");
+            default -> OutputManager.printError("Command unknown");
+        }
+    }
+
+    private void markFlagAndCheckForWin(){
+        displayBoard.markFlag(coordinates);
+        if(playerWon()){
+            System.out.println("You won!");
+            gameOver = true;
         }
     }
 
     private void uncover(Coordinates coordinates){
-        if(hiddenBoard.isBombAt(coordinates)){
-            playerBoard.setElement(coordinates,"✷");
+        gameOver = displayBoard.uncoverElement(coordinates,hiddenBoard);
+        if(gameOver){
             printBoard();
-            System.out.println("Sorry! You lost!");
-            gameOver = true;
-        } else if(playerBoard.squareUncovered(coordinates,String.valueOf(hiddenBoard.getValueAtPosition(coordinates)))){
-            System.out.println("This square is already visible, try again");
-        } else {
-            playerBoard.uncoverElement(coordinates,hiddenBoard);
+            OutputManager.printError("Sorry! You lost!");
         }
 
     }
@@ -66,8 +64,8 @@ public class GameManager {
 
 
     private boolean playerWon(){
-        for (int i = 0; i < playerBoard.BOARD_SIZE; i++) {
-            for (int j = 0; j < playerBoard.BOARD_SIZE; j++) {
+        for (int i = 0; i < displayBoard.BOARD_SIZE; i++) {
+            for (int j = 0; j < displayBoard.BOARD_SIZE; j++) {
                 if(!elementsMatch( new Coordinates(i,j))){
                     return false;
                 }
@@ -77,15 +75,15 @@ public class GameManager {
     }
 
     private boolean elementsMatch(Coordinates coordinates){
-        if(playerBoard.getValueAtPosition(coordinates).equals(String.valueOf(hiddenBoard.getValueAtPosition(coordinates))) || (playerBoard.getValueAtPosition(coordinates).equals("x") && !hiddenBoard.isBombAt(coordinates))){
+        if(displayBoard.getValueAtPosition(coordinates).equals(String.valueOf(hiddenBoard.getValueAtPosition(coordinates))) || (displayBoard.getValueAtPosition(coordinates).equals("x") && !hiddenBoard.isBombAt(coordinates))){
             return true;
         }
-        return playerBoard.getValueAtPosition(coordinates).equals("⚑") && hiddenBoard.isBombAt(coordinates);
+        return displayBoard.getValueAtPosition(coordinates).equals("⚑") && hiddenBoard.isBombAt(coordinates);
     }
 
     private void printBoard(){
         System.out.println("Current board:");
-        System.out.println(playerBoard.toString());
+        System.out.println(displayBoard.toString());
     }
 
 

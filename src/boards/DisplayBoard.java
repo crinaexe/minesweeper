@@ -1,56 +1,66 @@
 package boards;
 
 import helpers.Coordinates;
+import helpers.OutputManager;
 
-public class PlayerBoard extends Board {
+public class DisplayBoard extends Board {
     private final String[][] board;
 
-    public PlayerBoard() throws Exception {
+    public DisplayBoard() throws Exception {
         board = new String[BOARD_SIZE][BOARD_SIZE];
-        generatePlayerBoard();
+        generateDisplayBoard();
     }
 
-    private void generatePlayerBoard() {
+
+    private void generateDisplayBoard() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 board[i][j] = "x";
             }
         }
+        OutputManager.greeting(NR_OF_BOMBS);
     }
 
     public void setElement(Coordinates coordinates, String value) {
         try {
             board[coordinates.getX()][coordinates.getY()] = value;
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException ignored) {
 
         }
     }
 
-    public boolean squareUncovered(Coordinates coordinates, String value) {
+    public boolean isSquareUncovered(Coordinates coordinates, String value) {
         try {
             return board[coordinates.getX()][coordinates.getY()].equals(value);
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException ignored) {
 
         }
         return false;
     }
 
-    public void uncoverElement(Coordinates coordinates, HiddenBoard hiddenBoard) {
-        setElement(coordinates, String.valueOf(hiddenBoard.getValueAtPosition(coordinates)));
-        clearBoardOnSelection(coordinates, hiddenBoard);
+    public boolean uncoverElement(Coordinates coordinates, HiddenBoard hiddenBoard) {
+        if(hiddenBoard.isBombAt(coordinates)){
+            setElement(coordinates,"✷");
+            return true;
+        } else if(isSquareUncovered(coordinates,String.valueOf(hiddenBoard.getValueAtPosition(coordinates)))){
+            OutputManager.printError("This square is already visible, try again");
+        } else {
+            setElement(coordinates, String.valueOf(hiddenBoard.getValueAtPosition(coordinates)));
+            clearBoardOnSelection(coordinates, hiddenBoard);
+        }
+        return false;
     }
 
-    public void clearBoardOnSelection(Coordinates coordinates, HiddenBoard hiddenBoard) {
+    private void clearBoardOnSelection(Coordinates coordinates, HiddenBoard hiddenBoard) {
 
         if (0 == hiddenBoard.getValueAtPosition(coordinates)) {
             for (int rowMod = -1; rowMod <= 1; rowMod++) {
-                for (int colMod = -1; colMod <= 1; colMod++) {//iterate over the neighbours
+                for (int colMod = -1; colMod <= 1; colMod++) {
                     Coordinates neighbour = new Coordinates(coordinates.getX() + rowMod, coordinates.getY() + colMod);
 
                     try {
-                        if(board[neighbour.getX()][neighbour.getY()] == "x"){
-                            if (0 == hiddenBoard.getValueAtPosition(neighbour)
-                                    || 1 == hiddenBoard.getValueAtPosition(neighbour)) {
+                        if(board[neighbour.getX()][neighbour.getY()].equals("x")){
+                            if (9 != hiddenBoard.getValueAtPosition(neighbour)) {
                                 setElement(neighbour, String.valueOf(hiddenBoard.getValueAtPosition(neighbour)));
 
                                 if (0 == hiddenBoard.getValueAtPosition(neighbour)) {
@@ -58,7 +68,7 @@ public class PlayerBoard extends Board {
                                 }
                             }
                         }
-                    }  catch (ArrayIndexOutOfBoundsException e) {
+                    }  catch (ArrayIndexOutOfBoundsException ignored) {
 
                     }
 
@@ -67,6 +77,16 @@ public class PlayerBoard extends Board {
         } else {
             setElement(coordinates, String.valueOf(hiddenBoard.getValueAtPosition(coordinates)));
         }
+    }
+
+    public String getValueAtPosition(Coordinates coordinates) {
+        try {
+            return board[coordinates.getX()][coordinates.getY()];
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+
+        }
+        return "";
+
     }
 
 
@@ -92,7 +112,7 @@ public class PlayerBoard extends Board {
         for (int i = 0; i < BOARD_SIZE; i++) {
             toString += i + "  |  ";
             for (int j = 0; j < BOARD_SIZE; j++) {
-                    toString += board[i][j] + "  ";
+                    toString += OutputManager.colorCodeNumbers(board[i][j]) + "  ";
 
             }
             toString += "\n";
@@ -101,13 +121,4 @@ public class PlayerBoard extends Board {
         return toString;
     }
 
-    public String getValueAtPosition(Coordinates coordinates) {
-        try {
-            return board[coordinates.getX()][coordinates.getY()];
-        } catch (ArrayIndexOutOfBoundsException e) {
-
-        }
-        return "";
-
-    }
 }
