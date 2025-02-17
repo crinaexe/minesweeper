@@ -1,7 +1,6 @@
 package boards;
 
 import helpers.Coordinates;
-
 import java.util.Random;
 
 public class HiddenBoard extends Board{

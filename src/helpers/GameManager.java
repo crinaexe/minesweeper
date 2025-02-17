@@ -8,7 +8,7 @@ public class GameManager {
     private InputManager inputManager;
     private DisplayBoard displayBoard;
     private HiddenBoard hiddenBoard;
-    private Coordinates coordinates;
+
 
     public GameManager() {
     }
@@ -19,7 +19,7 @@ public class GameManager {
         while (!gameOver){
             printBoard();
             String command = inputManager.checkCommand();
-            coordinates = inputManager.getNumberSelection();
+            Coordinates coordinates = inputManager.getNumberSelection();
             performMenuAction(command,coordinates);
         }
     }
@@ -28,7 +28,7 @@ public class GameManager {
         displayBoard =  new DisplayBoard();
         printBoard();
         inputManager = new InputManager(displayBoard.BOARD_SIZE);
-        coordinates = inputManager.getNumberSelection();
+        Coordinates coordinates = inputManager.getNumberSelection();
 
         //Bomb is generated after player's first move, to prevent an instant lose
         hiddenBoard = new HiddenBoard(coordinates);
@@ -37,14 +37,14 @@ public class GameManager {
 
     private void performMenuAction(String option, Coordinates coordinates){
         switch (option) {
-            case "bo" -> markFlagAndCheckForWin();
+            case "bo" -> markFlagAndCheckForWin(coordinates);
             case "un" -> displayBoard.unMarkFlag(coordinates);
             case "re" -> uncover(coordinates);
             default -> OutputManager.printError("Command unknown");
         }
     }
 
-    private void markFlagAndCheckForWin(){
+    private void markFlagAndCheckForWin(Coordinates coordinates){
         displayBoard.markFlag(coordinates);
         if(playerWon()){
             System.out.println("You won!");

@@ -60,7 +60,7 @@ public class DisplayBoard extends Board {
 
                     try {
                         if(board[neighbour.getX()][neighbour.getY()].equals("x")){
-                            if (9 != hiddenBoard.getValueAtPosition(neighbour)) {
+                            if (!hiddenBoard.isBombAt(neighbour)) {
                                 setElement(neighbour, String.valueOf(hiddenBoard.getValueAtPosition(neighbour)));
 
                                 if (0 == hiddenBoard.getValueAtPosition(neighbour)) {
